@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Store</title>
+    <style>
+        body { font-family: Arial; background: #f4f4f4; }
+        .container { width: 80%; margin: auto; }
+        .book {
+            background: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+        }
+        .price {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Book Store</h1>
+
+        {% for book in books %}
+        <div class="book">
+            <h2>{{ book.name }}</h2>
+            <p>Category: {{ book.category }}</p>
+            <p class="price">₹ {{ book.price }}</p>
+        </div>
+        {% endfor %}
+
+    </div>
+</body>
+</html>
