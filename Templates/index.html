@@ -2,33 +2,54 @@
 <html>
 <head>
     <title>Book Store</title>
-    <style>
-        body { font-family: Arial; background: #f4f4f4; }
-        .container { width: 80%; margin: auto; }
-        .book {
-            background: white;
-            padding: 15px;
-            margin: 10px;
-            border-radius: 10px;
-        }
-        .price {
-            color: green;
-            font-weight: bold;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📚 Book Store</h1>
 
-        {% for book in books %}
-        <div class="book">
-            <h2>{{ book.name }}</h2>
-            <p>Category: {{ book.category }}</p>
-            <p class="price">₹ {{ book.price }}</p>
-        </div>
-        {% endfor %}
+<h1>📚 Book Store</h1>
 
-    </div>
+<!-- 🔍 Search -->
+<form method="GET">
+    <input type="text" name="q" placeholder="Search book">
+    <button type="submit">Search</button>
+</form>
+
+<!-- 🎯 Filter -->
+<form method="GET">
+    <select name="category">
+        <option value="">All</option>
+        <option>Fiction</option>
+        <option>Tech</option>
+        <option>Self-help</option>
+        <option>Finance</option>
+    </select>
+    <button type="submit">Filter</button>
+</form>
+
+<hr>
+
+<!-- 📚 Book List -->
+{% for book in books %}
+<div>
+    <h3>{{ book.name }}</h3>
+    <p>{{ book.category }}</p>
+    <p>₹ {{ book.price }}</p>
+
+    <!-- 🛒 Buy Button -->
+    <a href="/buy/{{ book.name }}">
+        <button>Buy</button>
+    </a>
+</div>
+<hr>
+{% endfor %}
+
+<!-- ➕ Add Book -->
+<h2>Add New Book</h2>
+<form method="POST" action="/add">
+    <input type="text" name="name" placeholder="Book Name" required>
+    <input type="text" name="category" placeholder="Category" required>
+    <input type="number" name="price" placeholder="Price" required>
+    <button type="submit">Add Book</button>
+</form>
+
 </body>
 </html>
