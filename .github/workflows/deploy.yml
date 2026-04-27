@@ -12,6 +12,7 @@ jobs:
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+
     steps:
       # 1. Checkout code
       - name: Checkout code
@@ -32,7 +33,7 @@ jobs:
           aws ecr get-login-password --region $AWS_REGION | \
           docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-      # 4. Build and push Docker image
+      # 4. Build and push image
       - name: Build and push Docker image
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
@@ -41,7 +42,7 @@ jobs:
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
 
-      # 5. Deploy on EC2
+      # 5. Deploy to EC2
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -59,11 +60,10 @@ jobs:
             # Pull latest image
             docker pull $IMAGE_URI
 
-            # Stop and remove old container
+            # Restart container
             docker stop bookstore-app || true
             docker rm bookstore-app || true
 
-            # Run new container
             docker run -d \
               --name bookstore-app \
               -p 8000:8000 \
