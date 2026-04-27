@@ -69,3 +69,4 @@ jobs:
               -p 8000:8000 \
               --restart always \
               $IMAGE_URI
+            # check if 
