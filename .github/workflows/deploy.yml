@@ -47,6 +47,8 @@ jobs:
             docker pull $(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_REGION.amazonaws.com/bookstore:latest
             docker stop bookstore-app || true
             docker rm bookstore-app || true
-            docker run -d --name bookstore-app -p 8000:8000 --restart always $(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_REGION.amazonaws.com/bookstore:latest
-
-          #everything has been setup
+            docker run -d \
+              --name bookstore-app \
+              -p 8000:8000 \
+              --restart always \
+              $(aws sts get-caller-identity --query Account --output text).dkr.ecr.$AWS_REGION.amazonaws.com/bookstore:latest
