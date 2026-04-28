@@ -14,11 +14,9 @@ jobs:
       ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
 
     steps:
-      # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -26,15 +24,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # 3. Login to ECR
       - name: Login to ECR
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          aws ecr get-login-password --region $AWS_REGION | \
-          docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-      # 4. Build and push image
-      - name: Build and push Docker image
+      - name: Build and Push Image
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
@@ -42,31 +37,22 @@ jobs:
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
 
-      # 5. Deploy to EC2
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
+          envs: AWS_REGION,ECR_REPOSITORY
           script: |
             ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
             IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
 
-            # Login to ECR
-            aws ecr get-login-password --region $AWS_REGION | \
-            docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-            # Pull latest image
             docker pull $IMAGE_URI
 
-            # Restart container
             docker stop bookstore-app || true
             docker rm bookstore-app || true
 
-            docker run -d \
-              --name bookstore-app \
-              -p 8000:8000 \
-              --restart always \
-              $IMAGE_URI
-            # check if 
+            docker run -d --name bookstore-app -p 8000:8000 --restart always $IMAGE_URI
