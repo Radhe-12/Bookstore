@@ -1,32 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Book Store</title>
+    <title>📚 Book Store</title>
     <style>
         body {
-            font-family: Arial;
-            background: #f4f6f8;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #667eea, #764ba2);
             margin: 0;
-        }
-
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 15px;
-            text-align: center;
+            padding: 0;
+            color: #333;
         }
 
         .container {
             width: 80%;
-            margin: 20px auto;
+            margin: auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
         }
 
         .book {
             background: white;
-            padding: 15px;
+            padding: 20px;
             margin: 15px 0;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .book:hover {
+            transform: scale(1.02);
         }
 
         .price {
@@ -35,82 +41,73 @@
         }
 
         button {
-            background: #3498db;
+            background: #667eea;
             color: white;
             border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
+            padding: 8px 15px;
+            border-radius: 6px;
             cursor: pointer;
         }
 
         button:hover {
-            background: #2980b9;
+            background: #5a67d8;
+        }
+
+        form {
+            margin: 10px 0;
         }
 
         input, select {
-            padding: 8px;
-            margin: 5px;
-        }
-
-        .form-section {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
+            padding: 6px;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: none;
         }
     </style>
 </head>
+
 <body>
+    <div class="container">
+        <h1>📚 Book Store</h1>
 
-<div class="header">
-    <h1>📚 Book Store</h1>
-</div>
+        <!-- Search -->
+        <form method="GET">
+            <input type="text" name="q" placeholder="Search book">
+            <button type="submit">Search</button>
+        </form>
 
-<div class="container">
+        <!-- Filter -->
+        <form method="GET">
+            <select name="category">
+                <option value="">All</option>
+                <option>Fiction</option>
+                <option>Tech</option>
+                <option>Self-help</option>
+                <option>Finance</option>
+            </select>
+            <button type="submit">Filter</button>
+        </form>
 
-    <!-- Search -->
-    <form method="GET">
-        <input type="text" name="q" placeholder="Search book">
-        <button type="submit">Search</button>
-    </form>
+        {% for book in books %}
+        <div class="book">
+            <h2>{{ book.name }}</h2>
+            <p>Category: {{ book.category }}</p>
+            <p class="price">₹ {{ book.price }}</p>
 
-    <!-- Filter -->
-    <form method="GET">
-        <select name="category">
-            <option value="">All</option>
-            <option>Fiction</option>
-            <option>Tech</option>
-            <option>Self-help</option>
-            <option>Finance</option>
-        </select>
-        <button type="submit">Filter</button>
-    </form>
+            <a href="/buy/{{ book.name }}">
+                <button>Buy</button>
+            </a>
+        </div>
+        {% endfor %}
 
-    <hr>
-
-    {% for book in books %}
-    <div class="book">
-        <h3>{{ book.name }}</h3>
-        <p>{{ book.category }}</p>
-        <p class="price">₹ {{ book.price }}</p>
-
-        <a href="/buy/{{ book.name }}">
-            <button>Buy</button>
-        </a>
-    </div>
-    {% endfor %}
-
-    <div class="form-section">
-        <h2>Add New Book</h2>
+        <h2 style="color:white;">Add New Book</h2>
         <form method="POST" action="/add">
             <input type="text" name="name" placeholder="Book Name" required>
             <input type="text" name="category" placeholder="Category" required>
             <input type="number" name="price" placeholder="Price" required>
             <button type="submit">Add Book</button>
         </form>
+
     </div>
-
-</div>
-
 </body>
 </html>
