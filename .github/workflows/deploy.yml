@@ -58,3 +58,4 @@ jobs:
 
             docker run -d --name bookstore-app -p 8000:8000 --restart always $IMAGE_URI
             # network issue fixed
+            #versioning added
