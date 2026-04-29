@@ -12,6 +12,7 @@ jobs:
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+      IMAGE_TAG: ${{ github.run_number}}
 
     steps:
       - name: Checkout code
@@ -32,7 +33,7 @@ jobs:
       - name: Build and Push Image
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+          IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
 
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
@@ -46,7 +47,7 @@ jobs:
           envs: AWS_REGION,ECR_REPOSITORY
           script: |
             ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-            IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+            IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
 
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
