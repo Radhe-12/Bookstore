@@ -1,113 +1,131 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>📚 Book Store</title>
+    <title>📚 Bookstore v2 Premium</title>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #667eea, #764ba2);
             margin: 0;
-            padding: 0;
-            color: #333;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px;
+            font-size: 32px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 1s ease-in;
+        }
+
+        .version {
+            font-size: 16px;
+            color: #38bdf8;
+            margin-top: 5px;
         }
 
         .container {
-            width: 80%;
+            max-width: 900px;
             margin: auto;
             padding: 20px;
         }
 
-        h1 {
-            text-align: center;
-            color: white;
-        }
-
-        .book {
-            background: white;
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
             padding: 20px;
             margin: 15px 0;
             border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: slideUp 0.5s ease;
         }
 
-        .book:hover {
-            transform: scale(1.02);
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.4);
         }
 
         .price {
-            color: green;
+            color: #22c55e;
             font-weight: bold;
         }
 
         button {
-            background: #667eea;
-            color: white;
+            background: linear-gradient(45deg, #38bdf8, #6366f1);
             border: none;
             padding: 8px 15px;
             border-radius: 6px;
             cursor: pointer;
+            color: white;
+            transition: transform 0.2s;
         }
 
         button:hover {
-            background: #5a67d8;
+            transform: scale(1.05);
+        }
+
+        input {
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            margin: 5px;
         }
 
         form {
-            margin: 10px 0;
+            margin-bottom: 15px;
         }
 
-        input, select {
-            padding: 6px;
-            margin-right: 10px;
-            border-radius: 5px;
-            border: none;
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+        @keyframes slideUp {
+            from {transform: translateY(20px); opacity: 0;}
+            to {transform: translateY(0); opacity: 1;}
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>📚 Book Store</h1>
 
-        <!-- Search -->
-        <form method="GET">
-            <input type="text" name="q" placeholder="Search book">
-            <button type="submit">Search</button>
-        </form>
+<div class="header">
+    🚀 Book Store Premium
+    <div class="version">Version 2 (Animated UI)</div>
+</div>
 
-        <!-- Filter -->
-        <form method="GET">
-            <select name="category">
-                <option value="">All</option>
-                <option>Fiction</option>
-                <option>Tech</option>
-                <option>Self-help</option>
-                <option>Finance</option>
-            </select>
-            <button type="submit">Filter</button>
-        </form>
+<div class="container">
 
-        {% for book in books %}
-        <div class="book">
-            <h2>{{ book.name }}</h2>
-            <p>Category: {{ book.category }}</p>
-            <p class="price">₹ {{ book.price }}</p>
+    <!-- Search -->
+    <form method="GET">
+        <input type="text" name="q" placeholder="Search book...">
+        <button type="submit">Search</button>
+    </form>
 
-            <a href="/buy/{{ book.name }}">
-                <button>Buy</button>
-            </a>
-        </div>
-        {% endfor %}
-
-        <h2 style="color:white;">Add New Book</h2>
-        <form method="POST" action="/add">
-            <input type="text" name="name" placeholder="Book Name" required>
-            <input type="text" name="category" placeholder="Category" required>
-            <input type="number" name="price" placeholder="Price" required>
-            <button type="submit">Add Book</button>
-        </form>
-
+    <!-- Books -->
+    {% for book in books %}
+    <div class="card">
+        <h3>{{ book.name }}</h3>
+        <p>Category: {{ book.category }}</p>
+        <p class="price">₹ {{ book.price }}</p>
+        <a href="/buy/{{ book.name }}">
+            <button>Buy Now</button>
+        </a>
     </div>
+    {% endfor %}
+
+    <!-- Add Book -->
+    <h3>Add New Book</h3>
+    <form method="POST" action="/add">
+        <input type="text" name="name" placeholder="Book Name" required>
+        <input type="text" name="category" placeholder="Category" required>
+        <input type="number" name="price" placeholder="Price" required>
+        <button type="submit">Add Book</button>
+    </form>
+
+</div>
+
 </body>
 </html>
