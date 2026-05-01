@@ -12,7 +12,7 @@ jobs:
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-      IMAGE_TAG: ${{ github.run_number}}
+      IMAGE_TAG: ${{ github.run_number }}
 
     steps:
       - name: Checkout code
@@ -28,12 +28,13 @@ jobs:
       - name: Login to ECR
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+          aws ecr get-login-password --region $AWS_REGION | \
+          docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - name: Build and Push Image
         run: |
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.run_number}}
+          IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.run_number }}
 
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
@@ -47,10 +48,11 @@ jobs:
           envs: AWS_REGION,ECR_REPOSITORY
           script: |
             ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-            IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.run_number}}
+            IMAGE_URI=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.run_number }}
 
             # Login to ECR
-            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+            aws ecr get-login-password --region $AWS_REGION | \
+            docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
             # Pull latest image
             docker pull $IMAGE_URI
@@ -63,43 +65,42 @@ jobs:
             echo "App deployed"
 
             # ---------------- MONITORING ----------------
-
             mkdir -p ~/monitoring
 
             # Prometheus config
             cat > ~/monitoring/prometheus.yml <<EOF
-global:
-  scrape_interval: 15s
+            global:
+              scrape_interval: 15s
 
-scrape_configs:
-  - job_name: 'node'
-    static_configs:
-      - targets: ['node-exporter:9100']
-EOF
+            scrape_configs:
+              - job_name: 'node'
+                static_configs:
+                  - targets: ['node-exporter:9100']
+            EOF
 
             # Docker compose file
             cat > ~/monitoring/docker-compose.yml <<EOF
-version: '3'
-services:
-  node-exporter:
-    image: prom/node-exporter
-    ports:
-      - "9100:9100"
+            version: '3'
+            services:
+              node-exporter:
+                image: prom/node-exporter
+                ports:
+                  - "9100:9100"
 
-  prometheus:
-    image: prom/prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
+              prometheus:
+                image: prom/prometheus
+                volumes:
+                  - ./prometheus.yml:/etc/prometheus/prometheus.yml
+                ports:
+                  - "9090:9090"
 
-  grafana:
-    image: grafana/grafana
-    ports:
-      - "3000:3000"
-EOF
+              grafana:
+                image: grafana/grafana
+                ports:
+                  - "3000:3000"
+            EOF
 
-            # Start monitoring (safe: won't recreate if running)
+            # Start monitoring
             cd ~/monitoring
             docker compose up -d
 
