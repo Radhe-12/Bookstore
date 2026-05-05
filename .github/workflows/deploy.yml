@@ -63,7 +63,20 @@ jobs:
             docker run -d --name bookstore-app -p 8001:8000 --restart always $IMAGE_URI
 
             echo "waiting for test app..."
-            test 5
+            for i in {1..10}; do
+              if curl http://localhost:8001 > /dev/null; then
+                echo "Test passed"
+                break
+              fi
+              echo "waiting"
+              sleep 3
+              done
+
+            if ! curl http://localhost:8001 > /dev/null; then
+              echo "test failed"
+              docker logs bookstore-app
+              exit 1
+            fi
             
             if curl http://localhost:8001; then
               echo "Test Passed"
@@ -76,7 +89,7 @@ jobs:
             #----------prod-env---------
             docker stop bookstore-app-prod || true
             docker rm bookstore-app-prod || true
-            docker run -d -p 8000:8000 --name bookstore-app-prod $IMAGE_URL
+            docker run -d -p 8000:8000 --name bookstore-app-prod --restart always $IMAGE_URL
             echo "production-deployed"
 
             # ---------------- MONITORING ----------------
