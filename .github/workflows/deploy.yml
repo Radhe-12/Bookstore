@@ -60,7 +60,7 @@ jobs:
             # ---------test-env--------
             docker stop bookstore-app || true
             docker rm bookstore-app || true
-            docker run -d --name bookstore-app -p 8001:8000 --restart always $IMAGE_URI
+            docker run -d -p 8001:8000 --name bookstore-app-test --restart always $IMAGE_URI
 
             echo "waiting for test app..."
             for i in {1..10}; do
@@ -89,8 +89,11 @@ jobs:
             #----------prod-env---------
             docker stop bookstore-app-prod || true
             docker rm bookstore-app-prod || true
-            docker run -d -p 8000:8000 --name bookstore-app-prod --restart always $IMAGE_URL
+            docker run -d -p 8000:8000 --name bookstore-app-prod --restart always $IMAGE_URI
             echo "production-deployed"
+
+            docker stop bookstore-app-test || true
+            docker rm bookstore-app-test || true
 
             # ---------------- MONITORING ----------------
             mkdir -p ~/monitoring
