@@ -120,3 +120,4 @@ jobs:
             docker compose up -d
 
             echo "Monitoring stack running"
+            #added new file
